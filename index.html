@@ -21,12 +21,18 @@
                 <div id="card-area"></div>
 
                 <!-- TODO: add Previous and Next buttons (ids "prev-button", "next-button") and a counter element (id="counter") -->
-
+                <div id="navigation">
+                    <button id="prev-button">Previous</button>
+                    <span id="counter">0 / 0</span>
+                    <button id="next-button">Next</button>
+                </div>
                 <div id="add-form">
                     <h2>Add a question</h2>
                     <!-- TODO: add <label> elements for each input element.  -->
-                    <input id="new-question" type="text" placeholder="New question">
-                    <input id="new-answer" type="text" placeholder="New answer">
+                    <label for="new-question">Question:</label>
+                    <input id="new-question" type="text" placeholder="Type a new question">
+                    <label for="new-answer">Answer:</label>
+                    <input id="new-answer" type="text" placeholder="Type a new answer">
                     <button id="add-button">Add question</button>
                 </div>
             </main>

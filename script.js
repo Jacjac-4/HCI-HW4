@@ -15,6 +15,9 @@ const newAnswer = document.querySelector("#new-answer");
 const editDialog = document.querySelector("#edit-dialog");
 const editQuestion = document.querySelector("#edit-question");
 const editAnswer = document.querySelector("#edit-answer");
+const prevButton = document.querySelector("#prev-button");
+const nextButton = document.querySelector("#next-button");  
+const counter = document.querySelector("#counter");
 // TODO: grab references to any necessary elements you added to index.html (search, counter, prev/next buttons)
 
 
@@ -79,6 +82,7 @@ function showPage() {
   if (currentIndex < 0) currentIndex = 0;
   renderPreviews();
   showCard();
+  updateCounter();
 }
 
 // Sidebar: one preview per question. Clicking a preview shows that card.
@@ -135,21 +139,53 @@ function showCard() {
     answerText.classList.toggle("hidden");
   });
 
-  card.append(deleteButton, editButton, questionText, answerText);
+  card.append(editButton, deleteButton, questionText, answerText);
   cardArea.append(card);
 }
 
 
 // ---------- Navigation and search ----------
 
-// TODO: Previous / Next. Write functions that change currentIndex to the appropriate value
-// (wrapping around at both ends) and then call showPage(). Then write event listeners to attach these
-// functions to the appropriate Previous/Next buttons. 
 
-// TODO: Update the progress text ("Card 3 of 3") in the counter whenever the card changes.
+async function goToPrevious() {
+  if (questions.length === 0) return;
+  currentIndex = (currentIndex - 1 + questions.length) % questions.length;
+  showPage();
+}
+async function goToNext() {
+  if (questions.length === 0) return;
+  currentIndex = (currentIndex + 1) % questions.length;
+  showPage();
+}
+
+prevButton.addEventListener("click", goToPrevious);
+nextButton.addEventListener("click", goToNext);
+
+
+
+function updateCounter() {
+  counter.textContent = questions.length === 0
+    ? "0 / 0"
+    : `${currentIndex + 1} / ${questions.length}`;
+}
 
 
 // ---------- Actions ----------
+
+function getValidatedCardData(question, answer) {
+  const trimmedQuestion = question.trim();
+  const trimmedAnswer = answer.trim();
+
+  if (!trimmedQuestion || !trimmedAnswer) {
+    showError("Question and answer cannot be empty.");
+    return null;
+  }
+
+  return {
+    question: trimmedQuestion,
+    answer: trimmedAnswer
+  };
+}
 
 async function deleteQuestion(question) {
   await apiSend("DELETE", "/delete/" + question.id);
@@ -168,19 +204,19 @@ document.querySelector("#close-dialog").addEventListener("click", function () {
 });
 
 document.querySelector("#update-button").addEventListener("click", async function () {
+  const cardData = getValidatedCardData(editQuestion.value, editAnswer.value);
+  if (!cardData) return;
+
   editDialog.close();
-  await apiSend("PUT", "/update/" + editingId, {
-    question: editQuestion.value,
-    answer: editAnswer.value
-  });
+  await apiSend("PUT", "/update/" + editingId, cardData);
   renderPage();
 });
 
 document.querySelector("#add-button").addEventListener("click", async function () {
-  await apiSend("POST", "/add", {
-    question: newQuestion.value,
-    answer: newAnswer.value
-  });
+  const cardData = getValidatedCardData(newQuestion.value, newAnswer.value);
+  if (!cardData) return;
+
+  await apiSend("POST", "/add", cardData);
   newQuestion.value = "";
   newAnswer.value = "";
   currentIndex = questions.length;

@@ -27,9 +27,18 @@ questions = [{
                 "id": 2,
                 "q": "What is the main goal of the ideation phase of iterative design?",
                 "a": "Generating as many possible design solutions as possible"
-                }
+                },
+            {
+                "id": 3,
+                "q": "What are the three models of disability?",
+                "a": "Moral, medical and social."
+                },
+            {
+                "id": 4,
+                "q": "What are the WCAG’s Four Principles of Accessibility?",
+                "a": "Perceivable, Operable, Understandable, and Robust."
+              }
             ]
-
 class QuestionRequest(BaseModel):
     question: str
     answer: str
@@ -47,6 +56,7 @@ def add_question(req: QuestionRequest):
     })
 
 # TODO: Add a new route that can be used to a delete a question/answer from the dataset.
+
 @app.delete("/delete/{id}")
 def delete_question(id: int):
     for question in questions:
@@ -56,7 +66,7 @@ def delete_question(id: int):
             return
     # If id was not found, raise exception
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Question with ID {id} not found")
-
+    
 @app.put("/update/{id}")
 def update_question(id: int, req: QuestionRequest):
     for question in questions:
@@ -66,6 +76,6 @@ def update_question(id: int, req: QuestionRequest):
             return
     # If id was not found, raise exception
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Question with ID {id} not found")
-
-if __name__=="__main__":
-    uvicorn.run(app, port=8005)
+       
+    if __name__=="__main__":
+        uvicorn.run(app, port=8005)
